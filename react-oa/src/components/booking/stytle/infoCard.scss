@@ -1,0 +1,49 @@
+.info-card {
+    width: 100%;
+    box-shadow: 0 0 50px 5px #e6e8ec;
+    border: 1px solid #e6e8ec;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    .title {
+        width: 100%;
+        height: 50px;
+        background-color: #f0f0f0;
+        color: #006eff;
+        line-height: 50px;
+        font-size: 18px;
+        padding-left: 20px;
+    }
+    .info {
+        width: 100%;
+        padding: 20px;
+        display: flex;
+        flex-wrap: wrap;
+        .info-item {
+            width: 30%;
+            padding: 20px 0;
+            .label {
+                color: #aaaaaa;
+                padding-right: 20px;
+            }
+        }
+        .btn {
+            align-self: center;
+            button {
+                width: 100px;
+                height: 40px;
+                margin-right: 20px;
+                border-radius: 5px;
+            }
+            .save {
+                border: 1px solid #006eff;
+                color: #fff;
+                background-color: #006eff;
+            }
+            .cancel {
+                color: #006eff;
+                background-color: #e6f1ff;
+                border: 1px solid #e6f1ff;
+            }
+        }
+    }
+}

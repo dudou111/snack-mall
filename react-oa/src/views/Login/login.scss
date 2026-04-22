@@ -1,0 +1,221 @@
+.login_container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    padding: 20px;
+
+    .login_panel {
+        width: 100%;
+        max-width: 450px;
+        background-color: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(10px);
+        padding: 40px 35px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+        border-radius: 20px;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        transition: all 0.3s ease;
+
+        &:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 25px 80px rgba(0, 0, 0, 0.2);
+        }
+
+        .title_big {
+            text-align: center;
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 8px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .title_sub {
+            text-align: center;
+            font-size: 0.9rem;
+            color: #666;
+            margin-bottom: 30px;
+            letter-spacing: 1px;
+            opacity: 0.8;
+        }
+
+        .login_tabs {
+            .ant-tabs-nav {
+                margin-bottom: 25px;
+                
+                .ant-tabs-nav-wrap {
+                    .ant-tabs-nav-list {
+                        width: 100%;
+                        
+                        .ant-tabs-tab {
+                            flex: 1;
+                            display: flex;
+                            justify-content: center;
+                            font-size: 16px;
+                            font-weight: 500;
+                            transition: all 0.3s ease;
+
+                            &:hover {
+                                color: #667eea;
+                            }
+
+                            &.ant-tabs-tab-active {
+                                .ant-tabs-tab-btn {
+                                    color: #667eea;
+                                    font-weight: 600;
+                                }
+                            }
+                        }
+                    }
+                }
+
+                .ant-tabs-ink-bar {
+                    background: linear-gradient(135deg, #667eea, #764ba2);
+                    height: 3px;
+                    border-radius: 1.5px;
+                }
+            }
+
+            .ant-tabs-content-holder {
+                .ant-form {
+                    .ant-form-item {
+                        margin-bottom: 20px;
+
+                        .ant-input,
+                        .ant-input-password {
+                            border-radius: 12px;
+                            border: 2px solid #e8e8e8;
+                            padding: 12px 15px;
+                            font-size: 14px;
+                            transition: all 0.3s ease;
+
+                            &:focus,
+                            &:hover {
+                                border-color: #667eea;
+                                box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+                            }
+
+                            .ant-input-prefix {
+                                margin-right: 12px;
+                                color: #999;
+                            }
+                        }
+
+                        .ant-checkbox-wrapper {
+                            color: #666;
+                            font-size: 14px;
+
+                            .ant-checkbox {
+                                .ant-checkbox-inner {
+                                    border-radius: 4px;
+                                    border: 2px solid #d9d9d9;
+                                    width: 18px;
+                                    height: 18px;
+
+                                    &::after {
+                                        width: 6px;
+                                        height: 10px;
+                                    }
+                                }
+
+                                &.ant-checkbox-checked {
+                                    .ant-checkbox-inner {
+                                        background-color: #667eea;
+                                        border-color: #667eea;
+                                    }
+                                }
+                            }
+                        }
+
+                        .ant-btn {
+                            &.ant-btn-primary {
+                                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                                border: none;
+                                border-radius: 12px;
+                                height: 48px;
+                                font-size: 16px;
+                                font-weight: 500;
+                                box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+                                transition: all 0.3s ease;
+
+                                &:hover {
+                                    transform: translateY(-2px);
+                                    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+                                }
+
+                                &:active {
+                                    transform: translateY(0);
+                                }
+
+                                &.ant-btn-loading {
+                                    .ant-btn-loading-icon {
+                                        color: white;
+                                    }
+                                }
+                            }
+
+                            &.ant-btn-link {
+                                color: #667eea;
+                                font-size: 13px;
+                                padding: 0;
+                                height: auto;
+
+                                &:hover {
+                                    color: #764ba2;
+                                    text-decoration: underline;
+                                }
+                            }
+                        }
+
+                        .ant-form-item-explain-error {
+                            font-size: 12px;
+                            color: #ff4d4f;
+                            margin-top: 4px;
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+// 响应式设计
+@media (max-width: 768px) {
+    .login_container {
+        padding: 15px;
+        
+        .login_panel {
+            max-width: 100%;
+            padding: 30px 25px;
+            
+            .title_big {
+                font-size: 1.8rem;
+            }
+            
+            .title_sub {
+                font-size: 0.8rem;
+            }
+        }
+    }
+}
+
+// 动画效果
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.login_panel {
+    animation: fadeInUp 0.6s ease-out;
+}

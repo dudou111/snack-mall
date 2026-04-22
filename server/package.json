@@ -1,0 +1,38 @@
+{
+  "name": "server",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "nodemon index.js",
+    "test": "node test-api.js",
+    "dev": "nodemon index.js",
+    "init-data": "node init-data.js",
+    "test:auth-models": "node test-auth-models.js",
+    "test:auth-routes": "node test-auth-routes.js",
+    "test:auth-middleware": "node test-auth-middleware.js",
+    "test:startup-diagnostics": "node test-startup-diagnostics.js",
+    "test:stripe-shape": "node test-stripe-payment-shape.js",
+    "test:server-routes": "node test-server-router-imports.js",
+    "test:role-compat": "node test-role-compat.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^1.6.0",
+    "cors": "^2.8.5",
+    "express": "^4.18.2",
+    "express-validator": "^6.15.0",
+    "form-data": "^4.0.0",
+    "http-proxy-middleware": "^2.0.6",
+    "jsonwebtoken": "^9.0.2",
+    "md5": "^2.3.0",
+    "mockjs": "^1.1.0",
+    "mongoose": "^7.5.0",
+    "multer": "^1.4.5-lts.1",
+    "nodemon": "^3.0.1",
+    "socket.io": "^4.7.2",
+    "stripe": "^22.0.2",
+    "ws": "^8.13.0"
+  }
+}

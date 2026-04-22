@@ -1,0 +1,290 @@
+.top {
+    text-align: center;
+    margin-bottom: 24px;
+    .col {
+        height: 100px;
+        box-shadow: 0 0 20px 1px #cccccc74;
+        margin: 10px;
+        border-radius: 10px;
+        display: flex;
+        justify-content: space-evenly;
+        align-items: center;
+        padding: 5px;
+        transition: all 0.2s ease;
+        &:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 20px 2px rgba(0, 0, 0, 0.1);
+        }
+        .left {
+            width: 80px;
+            height: 80px;
+            // background-color: #3587f8;
+            position: relative;
+            border-radius: 5px;
+            .icon {
+                color: #fff;
+                font-size: 30px;
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+            }
+        }
+        .center {
+            height: 100%;
+            text-align: left;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-evenly;
+            .num {
+                font-size: 30px;
+                font-weight: bold;
+            }
+            span {
+                color: #aaaaaa;
+            }
+        }
+        .right {
+            height: 60%;
+            .icon {
+                font-size: 20px;
+                transform: rotate(45deg);
+                color: #006eff;
+            }
+        }
+    }
+}
+
+// 页面布局样式
+.homeLayout {
+    background-color: #f5f5f5;
+    min-height: 100vh;
+    
+    .homeContent {
+        padding: 24px;
+        max-width: 1400px;
+        margin: 0 auto;
+        
+        @media (max-width: 768px) {
+            padding: 16px;
+        }
+        
+        @media (max-width: 576px) {
+            padding: 12px;
+        }
+    }
+}
+
+.pageHeader {
+    margin-bottom: 24px;
+}
+
+.fullWidthSection {
+    margin: 0 -24px 24px;
+    
+    @media (max-width: 768px) {
+        margin: 0 -16px 24px;
+    }
+    
+    @media (max-width: 576px) {
+        margin: 0 -12px 24px;
+    }
+}
+
+// Banner样式
+.bannerContainer {
+    margin-bottom: 24px;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    position: relative;
+    background-color: #f0f0f0; // 添加背景色作为加载前的占位
+
+    .carousel {
+        width: 100%;
+        
+        :global {
+            .ant-carousel {
+                width: 100%;
+            }
+            
+            .ant-carousel .slick-slider, 
+            .ant-carousel .slick-list, 
+            .ant-carousel .slick-track, 
+            .ant-carousel .slick-slide > div {
+                width: 100%;
+            }
+            
+            .ant-carousel .slick-dots {
+                bottom: 16px;
+                z-index: 10;
+                
+                li {
+                    margin: 0 6px;
+                    
+                    &.slick-active {
+                        width: 24px;
+                        
+                        button {
+                            width: 24px !important;
+                            background-color: #fff !important;
+                        }
+                    }
+                    
+                    button {
+                        width: 10px !important;
+                        height: 10px !important;
+                        border-radius: 5px !important;
+                        background-color: rgba(255, 255, 255, 0.6) !important;
+                    }
+                }
+            }
+        }
+
+        .carouselItem {
+            width: 100%;
+            height: 350px; // 固定高度，避免比例问题
+            position: relative;
+            overflow: hidden;
+            
+            @media (max-width: 768px) {
+                height: 250px;
+            }
+            
+            @media (max-width: 576px) {
+                height: 180px;
+            }
+            
+            .bannerImage {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+                object-position: center;
+                display: block;
+            }
+        }
+    }
+}
+
+// 热门产品样式
+.popularProducts {
+    margin-bottom: 24px;
+    padding: 16px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+
+    .sectionHeader {
+        margin-bottom: 16px;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .productCard {
+        height: 100%;
+        transition: all 0.3s ease;
+        
+        &:hover {
+            transform: translateY(-5px);
+        }
+
+        .productImageContainer {
+            height: 200px;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #f5f5f5;
+            
+            .productImage {
+                max-width: 100%;
+                max-height: 100%;
+                object-fit: contain;
+            }
+        }
+
+        .productTitle {
+            margin: 8px 0;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .productInfo {
+            .price {
+                font-size: 18px;
+                color: #ff4d4f;
+                margin-bottom: 4px;
+            }
+
+            .rating {
+                display: flex;
+                align-items: center;
+                margin-bottom: 4px;
+            }
+
+            .sales {
+                font-size: 12px;
+            }
+        }
+    }
+}
+
+// 分类样式
+.categories {
+    margin-bottom: 24px;
+    padding: 16px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+
+    .sectionHeader {
+        margin-bottom: 16px;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .categoryCard {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        transition: all 0.3s;
+        
+        &:hover {
+            transform: translateY(-5px);
+        }
+
+        .categoryIcon {
+            font-size: 24px;
+            color: white;
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 12px;
+        }
+
+        .categoryContent {
+            .popularItems {
+                margin-top: 8px;
+                font-size: 12px;
+            }
+        }
+    }
+}
+
+// 常规内容区域样式
+.contentSection {
+    margin-bottom: 24px;
+    padding: 16px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}

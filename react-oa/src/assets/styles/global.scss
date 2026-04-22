@@ -1,0 +1,68 @@
+.logo {
+    height: 32px;
+    margin: 16px;
+    background-color: #ccc;
+}
+
+.site-layout .site-layout-background {
+    background: #fff;
+}
+
+// 标题
+.header {
+    display: flex;
+    margin: 0 0 24px;
+    justify-content: space-between;
+    align-items: center;
+    .div1 {
+        display: flex;
+        align-items: center;
+        .icon {
+            width: 30px;
+            height: 10px;
+            border-radius: 10px;
+            background-color: #006eff;
+        }
+        span:nth-of-type(1) {
+            font-size: 24px;
+            margin-left: 50px;
+        }
+    }
+
+    .div2 {
+    }
+}
+
+// 懒加载
+.content {
+    padding: 50px;
+    background: rgba(0, 0, 0, 0.05);
+    border-radius: 4px;
+}
+
+//  图片
+.toolbar-wrapper {
+    position: fixed;
+    bottom: 32px;
+    left: 50%;
+    padding: 0px 24px;
+    color: #fff;
+    font-size: 20px;
+    background-color: rgba(0, 0, 0, 0.1);
+    border-radius: 100px;
+    transform: translateX(-50%);
+}
+
+.toolbar-wrapper .anticon {
+    padding: 12px;
+    cursor: pointer;
+}
+
+.toolbar-wrapper .anticon[disabled] {
+    cursor: not-allowed;
+    opacity: 0.3;
+}
+
+.toolbar-wrapper .anticon:hover {
+    opacity: 0.3;
+}

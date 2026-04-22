@@ -1,0 +1,52 @@
+.top{
+    display: flex;
+    align-items: center;
+    margin-bottom: 26px;
+    .blueBox{
+        background-color: #006EFF;
+        width: 24px;
+        height: 8px;
+        border-radius: 10px;
+        margin-right: 10px;
+    }
+    span{
+        color: #333;
+        font-size: 24px;
+    }
+}
+.BigBox{
+    display: flex;
+    flex-wrap: wrap;
+}
+.TextDivBox{
+    margin-right: 150px;
+}
+
+.custom{
+    .ant-table-cell{
+        background-color: #006EFF;
+    }
+}
+.disBox{
+    margin-bottom: 40px;
+    .title{
+        font-size: 14px ;
+        color: #aaa;
+        margin-right: 48px;
+    }
+}
+
+
+.ChangeDivBox{
+    margin-right: 100px;
+}
+.changeBox{
+    display: flex;
+    align-items: center;
+    margin-bottom: 40px;
+    .title{
+        font-size: 14px ;
+        color: #aaa;
+        margin-right: 38px;
+    }
+}

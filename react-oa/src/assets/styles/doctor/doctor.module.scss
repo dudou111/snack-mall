@@ -1,0 +1,23 @@
+.header {
+    display: flex;
+    margin: 0 0 24px;
+    justify-content: space-between;
+    align-items: center;
+    .div1 {
+        display: flex;
+        align-items: center;
+        .icon {
+            width: 30px;
+            height: 10px;
+            border-radius: 10px;
+            background-color: #006eff;
+        }
+        span:nth-of-type(1) {
+            font-size: 24px;
+            margin-left: 50px;
+        }
+    }
+
+    .div2 {
+    }
+}
