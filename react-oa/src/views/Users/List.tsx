@@ -521,21 +521,6 @@ const UserList: React.FC = () => {
         />
       )}
       
-      <Alert
-        message="💡 状态修改功能说明"
-        description={
-          <div>
-            <p><strong>用户身份切换</strong>: 点击角色标签可在VIP会员和普通用户之间切换</p>
-            <p><strong>用户状态管理</strong>: 点击状态标签可设置为启用、禁用或封禁</p>
-            <p><strong>智能保护</strong>: 系统会自动防止删除最后一个管理员或禁用管理员账户</p>
-            <p><strong>实时反馈</strong>: 更新时会显示加载动画，成功后自动刷新数据</p>
-          </div>
-        }
-        type="info"
-        showIcon
-        closable
-        style={{ marginBottom: 16 }}
-      />
       
       {/* 搜索栏 */}
       <Row gutter={16} style={{ marginBottom: 16 }}>

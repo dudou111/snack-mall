@@ -31,17 +31,14 @@ const items: MenuProps['items'] = [
 
 const Avatars: React.FC = () => {
 
-    const userInfo = useSelector((state: StoreState) => state.user.userInfo)
     const avatar = useSelector((state: StoreState) => state.user.userInfo?.avatar)
-    console.log('userInfo',userInfo);
-
 
     return (
         <Dropdown menu={{ items }}>
             <Space
                 direction="vertical"
                 size={16}
-                style={{ margin: '0 16px', float: 'right' }}
+                style={{ margin: '0 16px 0 0' }}
             >
                 <Space wrap size={16}>
                     <Avatar size="large" src={avatar} icon={<UserOutlined />} />

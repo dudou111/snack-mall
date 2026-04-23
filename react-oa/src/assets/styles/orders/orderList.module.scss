@@ -1,0 +1,247 @@
+.orderProductStack {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.orderProductItem {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 220px;
+}
+
+.orderProductThumb {
+  flex: 0 0 44px;
+  width: 44px;
+  height: 44px;
+  overflow: hidden;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #fff7ea, #edf5ff);
+  border: 1px solid #eef0f4;
+}
+
+.orderProductThumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.orderProductFallback {
+  width: 100%;
+  height: 100%;
+  display: grid;
+  place-items: center;
+  color: #9aa4b2;
+  font-size: 12px;
+}
+
+.orderProductName {
+  font-weight: 700;
+  color: #172033;
+  line-height: 1.35;
+}
+
+.orderProductMeta {
+  margin-top: 2px;
+  color: #8a94a6;
+  font-size: 12px;
+}
+
+.orderMoreText {
+  color: #8a94a6;
+  font-size: 12px;
+}
+
+.orderDetailBody {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  background: #f6f8fb;
+  margin: -24px;
+  padding: 24px;
+  min-height: calc(100vh - 56px);
+}
+
+.orderDetailHero {
+  padding: 22px;
+  border-radius: 24px;
+  color: #fff7e8;
+  background:
+    radial-gradient(circle at 82% 18%, rgba(255, 188, 92, 0.32), transparent 30%),
+    linear-gradient(145deg, #172033, #26394f);
+  box-shadow: 0 20px 42px rgba(23, 32, 51, 0.18);
+}
+
+.orderDetailKicker {
+  display: block;
+  color: #ffb86d;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+}
+
+.orderDetailHeroMain {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 18px;
+  margin-top: 12px;
+}
+
+.orderCustomerName {
+  margin: 0;
+  color: #fff7e8;
+  font-size: 30px;
+  line-height: 1;
+}
+
+.orderDetailTime {
+  margin-top: 8px;
+  color: rgba(255, 247, 232, 0.72);
+}
+
+.orderAmount {
+  text-align: right;
+}
+
+.orderAmount span {
+  display: block;
+  color: rgba(255, 247, 232, 0.72);
+  font-size: 12px;
+}
+
+.orderAmount strong {
+  color: #ffd391;
+  font-size: 32px;
+}
+
+.orderDetailGrid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(260px, 0.95fr);
+  gap: 16px;
+}
+
+.detailCard {
+  padding: 18px;
+  border-radius: 22px;
+  background: rgba(255, 255, 255, 0.94);
+  border: 1px solid rgba(222, 228, 238, 0.9);
+  box-shadow: 0 14px 34px rgba(31, 45, 61, 0.08);
+}
+
+.detailCard h3 {
+  margin: 0 0 14px;
+  color: #172033;
+  font-size: 18px;
+}
+
+.detailLine {
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 8px 0;
+  border-bottom: 1px solid #f0f2f5;
+}
+
+.detailLine:last-child {
+  border-bottom: none;
+}
+
+.detailLine span {
+  color: #8993a3;
+}
+
+.detailLine strong {
+  color: #172033;
+  text-align: right;
+}
+
+.detailProducts {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.detailProductItem {
+  display: grid;
+  grid-template-columns: 64px 1fr auto;
+  gap: 12px;
+  align-items: center;
+  padding: 12px;
+  border: 1px solid #edf0f5;
+  border-radius: 18px;
+  background: #fbfcff;
+}
+
+.detailProductImage {
+  width: 64px;
+  height: 64px;
+  overflow: hidden;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #fff7ea, #edf5ff);
+}
+
+.detailProductImage img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.detailProductFallback {
+  width: 100%;
+  height: 100%;
+  display: grid;
+  place-items: center;
+  color: #9aa4b2;
+  font-size: 12px;
+}
+
+.detailProductName {
+  color: #172033;
+  font-weight: 800;
+}
+
+.detailProductMeta {
+  margin-top: 4px;
+  color: #8993a3;
+  font-size: 12px;
+}
+
+.detailProductTotal {
+  color: #ff6b21;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.refundBlock {
+  margin-top: 16px;
+}
+
+@media (max-width: 980px) {
+  .orderDetailGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .orderDetailHeroMain,
+  .detailLine {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .orderAmount {
+    text-align: left;
+  }
+
+  .detailProductItem {
+    grid-template-columns: 56px 1fr;
+  }
+
+  .detailProductTotal {
+    grid-column: 2;
+  }
+}

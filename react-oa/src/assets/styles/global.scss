@@ -8,6 +8,16 @@
     background: #fff;
 }
 
+html {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+html::-webkit-scrollbar,
+body::-webkit-scrollbar {
+  display: none;
+}
+
 // 标题
 .header {
     display: flex;

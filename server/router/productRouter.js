@@ -4,6 +4,7 @@ const productCtrl = require('../controllers/productCtrl');
 const categoryCtrl = require('../controllers/categoryCtrl');
 const brandCtrl = require('../controllers/brandCtrl');
 const auth = require('../middleware/auth');
+const { productImageUpload } = require('../utils/productImageUpload');
 
 // 商品管理路由
 // 获取商品列表
@@ -12,6 +13,8 @@ router.get('/products', productCtrl.getProducts);
 router.get('/products/:id', productCtrl.getProductById);
 // 创建商品
 router.post('/products', auth, productCtrl.createProduct);
+// 上传商品图片
+router.post('/upload-image', auth, productImageUpload.single('image'), productCtrl.uploadProductImage);
 // 更新商品
 router.put('/products/:id', auth, productCtrl.updateProduct);
 // 删除商品

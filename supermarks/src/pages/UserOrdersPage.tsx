@@ -6,11 +6,20 @@ function formatMoney(value: number): string {
   return `¥${value.toFixed(2)}`;
 }
 
+const STRIPE_CNY_MAX_AMOUNT = 999999.99;
+
+interface PaymentSuccessDialogState {
+  orderNumber: string;
+  amount: number;
+  paymentIntentId?: string;
+}
+
 export default function UserOrdersPage() {
   const [orders, setOrders] = useState<OrderEntity[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [actionId, setActionId] = useState("");
+  const [paymentSuccess, setPaymentSuccess] = useState<PaymentSuccessDialogState | null>(null);
 
   async function loadOrders() {
     setLoading(true);
@@ -33,7 +42,12 @@ export default function UserOrdersPage() {
     setActionId(order._id + "stripe");
     setError("");
     try {
-      await orderApi.stripeTestPay({ orderId: order._id });
+      const result = await orderApi.stripeTestPay({ orderId: order._id });
+      setPaymentSuccess({
+        orderNumber: result.order?.orderNumber || order.orderNumber,
+        amount: result.order?.actualAmount ?? order.actualAmount,
+        paymentIntentId: result.paymentIntentId
+      });
       await loadOrders();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Stripe 测试支付失败");
@@ -74,11 +88,10 @@ export default function UserOrdersPage() {
 
         <div className="table-like">
           {orders.map((order) => {
-            const canRefund =
-              order.paymentStatus === "已支付" &&
-              order.deliveryStatus !== "已送达" &&
+            const canApplyRefund =
               order.refund?.reviewStatus !== "待处理" &&
               order.refund?.reviewStatus !== "已通过";
+            const stripeAmountExceeded = order.actualAmount > STRIPE_CNY_MAX_AMOUNT;
 
             return (
               <div className="row-card" key={order._id}>
@@ -103,28 +116,33 @@ export default function UserOrdersPage() {
                       {order.refund.rejectReason ? `（驳回原因：${order.refund.rejectReason}）` : ""}
                     </p>
                   ) : null}
+                  {stripeAmountExceeded ? (
+                    <p className="error-text">
+                      Stripe单笔支付金额上限为 {formatMoney(STRIPE_CNY_MAX_AMOUNT)}，当前订单请拆分后支付。
+                    </p>
+                  ) : null}
                 </div>
                 <div className="inline-actions wrap">
                   {order.paymentStatus === "未支付" ? (
                     <>
                       <button
                         className="primary-btn"
-                        disabled={actionId === order._id + "stripe"}
+                        disabled={actionId === order._id + "stripe" || stripeAmountExceeded}
                         onClick={() => handleStripePay(order)}
                       >
-                        {actionId === order._id + "stripe" ? "支付处理中..." : "Stripe 测试支付"}
+                        {actionId === order._id + "stripe" ? "支付处理中..." : "Stripe 支付"}
                       </button>
-                      <span className="muted">测试支付由后端 Stripe 测试模式完成</span>
+                      <span className="muted"></span>
                     </>
                   ) : null}
 
-                  {canRefund ? (
+                  {canApplyRefund ? (
                     <button
                       className="warn-btn"
                       disabled={actionId === order._id + "refund"}
                       onClick={() => handleRefund(order)}
                     >
-                      申请全额退款
+                      {actionId === order._id + "refund" ? "提交中..." : "申请退款"}
                     </button>
                   ) : null}
                 </div>
@@ -133,6 +151,49 @@ export default function UserOrdersPage() {
           })}
         </div>
       </section>
+
+      {paymentSuccess ? (
+        <div className="payment-success-overlay" role="dialog" aria-modal="true" aria-label="支付成功">
+          <div className="payment-success-modal">
+            <span className="payment-success-kicker">PAYMENT COMPLETE</span>
+            <div className="payment-success-badge">支付成功</div>
+            <h2>订单已完成支付</h2>
+            <p className="muted">
+              这笔订单已经通过 Stripe 测试支付完成，可以继续查看物流状态或返回挑选其他商品。
+            </p>
+
+            <div className="payment-success-grid">
+              <div className="payment-success-card">
+                <span>订单号</span>
+                <strong>{paymentSuccess.orderNumber}</strong>
+              </div>
+              <div className="payment-success-card">
+                <span>支付金额</span>
+                <strong>{formatMoney(paymentSuccess.amount)}</strong>
+              </div>
+              <div className="payment-success-card wide">
+                <span>Stripe 流水</span>
+                <strong>{paymentSuccess.paymentIntentId || "已创建"}</strong>
+              </div>
+            </div>
+
+            <div className="payment-success-actions">
+              <button className="ghost-btn" onClick={() => setPaymentSuccess(null)}>
+                继续查看订单
+              </button>
+              <button
+                className="primary-btn"
+                onClick={async () => {
+                  setPaymentSuccess(null);
+                  await loadOrders();
+                }}
+              >
+                刷新订单状态
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : null}
     </div>
   );
 }

@@ -71,6 +71,7 @@ export interface UploadRecordMerchant {
 export interface UploadRecord {
   _id: string;
   name: string;
+  image?: string;
   sku?: string;
   brand: string;
   category: string;

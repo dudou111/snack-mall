@@ -20,6 +20,7 @@ import {
   type UploadRecord,
   type UploadRecordListParams,
 } from '../../api/product';
+import styles from '@/assets/styles/products/uploadRecord.module.scss';
 
 const { RangePicker } = DatePicker;
 const { Option } = Select;
@@ -115,17 +116,25 @@ const Inventory: React.FC = () => {
   const columns = [
     {
       title: '商品名称',
-      dataIndex: 'name',
       key: 'name',
-      width: 220,
-      ellipsis: true,
-    },
-    {
-      title: 'SKU',
-      dataIndex: 'sku',
-      key: 'sku',
-      width: 140,
-      render: (sku: string) => sku || '-',
+      width: 280,
+      render: (_: unknown, record: UploadRecord) => (
+        <div className={styles.uploadRecordProduct}>
+          <div className={styles.uploadRecordThumb}>
+            {record.image ? (
+              <img src={record.image} alt={record.name || '商品图片'} />
+            ) : (
+              <div className={styles.uploadRecordFallback}>无图</div>
+            )}
+          </div>
+          <div>
+            <div className={styles.uploadRecordName}>{record.name || '-'}</div>
+            <div className={styles.uploadRecordMeta}>
+              {record.createdByRole === 'merchant' ? '商家上传' : '系统商品'}
+            </div>
+          </div>
+        </div>
+      ),
     },
     {
       title: '商家',
@@ -192,7 +201,7 @@ const Inventory: React.FC = () => {
       <Row gutter={16} style={{ marginBottom: 16 }}>
         <Col span={8}>
           <Input
-            placeholder="搜索商品名/SKU/品牌/分类"
+            placeholder="搜索商品名/品牌/分类"
             prefix={<SearchOutlined />}
             value={searchParams.keyword}
             onChange={(e) => setSearchParams((prev) => ({ ...prev, keyword: e.target.value }))}

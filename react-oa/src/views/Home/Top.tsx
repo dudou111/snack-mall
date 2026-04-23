@@ -1,82 +1,81 @@
-import { Col, Row } from "antd";
-import top from "@/assets/styles/home/home.module.scss";
+import styles from "@/assets/styles/home/home.module.scss";
 import {
   ShoppingCartOutlined,
-  ArrowUpOutlined,
   UsergroupAddOutlined,
   PayCircleFilled,
   LineChartOutlined,
   GiftOutlined,
 } from "@ant-design/icons";
+import type { DashboardSummary } from "@/api/dashboard";
 
-export default function Top() {
+interface TopProps {
+  summary?: DashboardSummary;
+}
+
+const defaultSummary: DashboardSummary = {
+  todayOrders: 0,
+  todaySales: 0,
+  totalProducts: 0,
+  uploadedToday: 0,
+  pendingShipment: 0,
+  totalUsers: 0
+};
+
+function formatMoney(value: number) {
+  return `¥${Number(value || 0).toLocaleString("zh-CN", { maximumFractionDigits: 2 })}`;
+}
+
+function buildStats(summary: DashboardSummary) {
+  return [
+    {
+      label: "今日订单",
+      value: summary.todayOrders.toLocaleString("zh-CN"),
+      icon: <ShoppingCartOutlined />,
+      color: "#ff8a3d",
+    },
+    {
+      label: "用户总数",
+      value: summary.totalUsers.toLocaleString("zh-CN"),
+      icon: <UsergroupAddOutlined />,
+      color: "#2f80ed",
+    },
+    {
+      label: "今日销售额",
+      value: formatMoney(summary.todaySales),
+      icon: <PayCircleFilled />,
+      color: "#1fbf75",
+    },
+    {
+      label: "商品总数",
+      value: summary.totalProducts.toLocaleString("zh-CN"),
+      icon: <LineChartOutlined />,
+      color: "#f2b84b",
+    },
+    {
+      label: "今日上传",
+      value: summary.uploadedToday.toLocaleString("zh-CN"),
+      icon: <GiftOutlined />,
+      color: "#d45bff",
+    }
+  ];
+}
+
+export default function Top({ summary = defaultSummary }: TopProps) {
+  const stats = buildStats(summary);
+
   return (
-    <Row
-      className={top.top}
-      align={"middle"}
-      justify={"space-between"}
-      wrap={false}
-    >
-      <Col span={4} className={top.col}>
-        <div className={top.left} style={{ backgroundColor: "#3587f8" }}>
-          <ShoppingCartOutlined className={top.icon} />
-        </div>
-        <div className={top.center}>
-          <div className={top.num}>1,286</div>
-          <span>今日订单数量</span>
-        </div>
-        <div className={top.right}>
-          <ArrowUpOutlined className={top.icon} />
-        </div>
-      </Col>
-      <Col span={4} className={top.col}>
-        <div className={top.left} style={{ backgroundColor: "#ef737a" }}>
-          <UsergroupAddOutlined className={top.icon} />
-        </div>
-        <div className={top.center}>
-          <div className={top.num}>856</div>
-          <span>今日活跃用户</span>
-        </div>
-        <div className={top.right}>
-          <ArrowUpOutlined className={top.icon} />
-        </div>
-      </Col>
-      <Col span={4} className={top.col}>
-        <div className={top.left} style={{ backgroundColor: "#85e97d" }}>
-          <PayCircleFilled className={top.icon} />
-        </div>
-        <div className={top.center}>
-          <div className={top.num}>¥28,650</div>
-          <span>今日销售额</span>
-        </div>
-        <div className={top.right}>
-          <ArrowUpOutlined className={top.icon} />
-        </div>
-      </Col>
-      <Col span={4} className={top.col}>
-        <div className={top.left} style={{ backgroundColor: "#fcb269" }}>
-          <LineChartOutlined className={top.icon} />
-        </div>
-        <div className={top.center}>
-          <div className={top.num}>2,456</div>
-          <span>今日商品浏览量</span>
-        </div>
-        <div className={top.right}>
-          <ArrowUpOutlined className={top.icon} />
-        </div>
-      </Col>
-      <Col span={4} className={top.col}>
-        <div className={top.left} style={{ backgroundColor: "#a23fff" }}>
-          <GiftOutlined className={top.icon} />
-        </div>
-        <div className={top.center}>
-          <div className={top.num}>168</div>
-          <span>今日新注册用户</span>
-        </div>
-        <div className={top.right}>
-          <ArrowUpOutlined className={top.icon} />
-        </div>
-      </Col>
-    </Row>
+    <div className={styles.top}>
+      {stats.map((item) => (
+        <article className={styles.statCard} key={item.label}>
+          <div className={styles.statIcon} style={{ backgroundColor: item.color }}>
+            {item.icon}
+          </div>
+          <div className={styles.statBody}>
+            <strong>{item.value}</strong>
+            <span>{item.label}</span>
+          </div>
+        </article>
+      ))}
+    </div>
   );
 }

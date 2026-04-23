@@ -8,7 +8,13 @@ export interface ApiResponse<T> {
 
 // 订单接口类型定义
 export interface OrderItem {
-  productId: string;
+  productId: string | {
+    _id: string;
+    name: string;
+    image?: string;
+    category?: string;
+    brand?: string;
+  };
   productName: string;
   price: number;
   quantity: number;

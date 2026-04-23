@@ -2,6 +2,7 @@ const Order = require('../model/Order');
 const Product = require('../model/Product');
 const Stripe = require('stripe');
 const { assertStripeSecretKey } = require('../utils/stripeConfig');
+const { broadcastNotification } = require('../utils/notificationHub');
 
 const getRole = (userInfo) => {
     if (!userInfo) return 'guest';
@@ -35,6 +36,25 @@ function getStripeClient() {
 
 function toStripeAmount(amount) {
     return Math.round(Number(amount) * 100);
+}
+
+const STRIPE_CNY_MAX_AMOUNT = 999999.99;
+
+function validateStripeAmount(amount) {
+    const normalizedAmount = Number(amount);
+
+    if (!Number.isFinite(normalizedAmount) || normalizedAmount <= 0) {
+        return '订单金额不合法，无法发起Stripe支付';
+    }
+
+    if (normalizedAmount > STRIPE_CNY_MAX_AMOUNT) {
+        return `Stripe单笔支付金额不能超过¥${STRIPE_CNY_MAX_AMOUNT.toLocaleString('zh-CN', {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
+        })}`;
+    }
+
+    return '';
 }
 
 async function applyStripePaymentResult(order, paymentIntent) {
@@ -259,6 +279,18 @@ exports.createOrder = async (req, res) => {
                 { $inc: { stock: -item.quantity, sales: item.quantity } }
             );
         }
+
+        broadcastNotification({
+            id: `order-${order._id}`,
+            type: 'order.created',
+            title: `用户 ${order.customer.name} 下单`,
+            description: `${order.items.map((item) => item.productName).join('、')}，实付 ¥${order.actualAmount}`,
+            time: order.orderTime,
+            payload: {
+                orderId: order._id,
+                orderNumber: order.orderNumber
+            }
+        });
 
         res.json({
             code: 0,
@@ -613,6 +645,14 @@ exports.createStripePaymentIntent = async (req, res) => {
             });
         }
 
+        const stripeAmountError = validateStripeAmount(order.actualAmount);
+        if (stripeAmountError) {
+            return res.json({
+                code: 1,
+                message: stripeAmountError
+            });
+        }
+
         const stripe = getStripeClient();
         const paymentIntent = await stripe.paymentIntents.create({
             amount: toStripeAmount(order.actualAmount),
@@ -731,20 +771,6 @@ exports.applyRefund = async (req, res) => {
             return res.json({
                 code: 1,
                 message: '无权申请该订单退款'
-            });
-        }
-
-        if (order.paymentStatus !== '已支付') {
-            return res.json({
-                code: 1,
-                message: '仅已支付订单可申请退款'
-            });
-        }
-
-        if (order.deliveryStatus === '已送达') {
-            return res.json({
-                code: 1,
-                message: '已送达订单暂不支持退款'
             });
         }
 

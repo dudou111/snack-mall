@@ -1,9 +1,53 @@
 const Product = require('../model/Product');
 const Category = require('../model/Category');
 const Brand = require('../model/Brand');
+const { buildProductImageUrl } = require('../utils/productImageUpload');
+const { broadcastNotification } = require('../utils/notificationHub');
 
 const isAdminUser = (user) => Boolean(user && (user.isAdmin || user.role === 'admin'));
 const isMerchantUser = (user) => Boolean(user && user.role === 'merchant');
+
+const uploadProductImage = async (req, res) => {
+    try {
+        const operator = req.userInfo;
+
+        if (!operator) {
+            return res.json({
+                code: 1,
+                message: '请先登录后再上传图片'
+            });
+        }
+
+        if (!isAdminUser(operator) && !isMerchantUser(operator)) {
+            return res.json({
+                code: 1,
+                message: '当前角色无权上传商品图片'
+            });
+        }
+
+        if (!req.file) {
+            return res.json({
+                code: 1,
+                message: '请选择要上传的图片'
+            });
+        }
+
+        res.json({
+            code: 0,
+            message: '商品图片上传成功',
+            data: {
+                imageUrl: buildProductImageUrl(req, req.file.filename),
+                filename: req.file.filename
+            }
+        });
+    } catch (error) {
+        console.error('商品图片上传失败:', error);
+        res.json({
+            code: 1,
+            message: error.message || '商品图片上传失败'
+        });
+    }
+};
 
 // 获取商品列表
 const getProducts = async (req, res) => {
@@ -172,6 +216,18 @@ const createProduct = async (req, res) => {
         
         // 更新品牌商品数量
         await updateBrandProductCount(productData.brand);
+
+        broadcastNotification({
+            id: `product-${product._id}`,
+            type: 'product.created',
+            title: '商家上传商品',
+            description: `${product.name} / ${product.brand}`,
+            time: product.uploadTime,
+            payload: {
+                productId: product._id,
+                image: product.image
+            }
+        });
 
         res.json({
             code: 0,
@@ -594,6 +650,7 @@ module.exports = {
     getProducts,
     getProductById,
     createProduct,
+    uploadProductImage,
     updateProduct,
     deleteProduct,
     batchDeleteProducts,

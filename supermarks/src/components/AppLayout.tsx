@@ -16,7 +16,7 @@ export default function AppLayout({ user, onLogout, children }: AppLayoutProps) 
       <header className="topbar">
         <div>
           <h1 className="brand-title">SNACK MALL</h1>
-          <p className="brand-sub">三角色业务工作台</p>
+          <p className="brand-sub">仪表盘</p>
         </div>
         <div className="topbar-meta">
           <span className="role-badge">{user.role === "merchant" ? "商家" : "用户"}</span>

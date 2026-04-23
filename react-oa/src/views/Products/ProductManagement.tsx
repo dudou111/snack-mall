@@ -16,8 +16,6 @@ import {
   InputNumber,
   Image,
   Drawer,
-  Descriptions,
-  Divider,
   Tooltip,
   Badge
 } from 'antd';
@@ -29,8 +27,7 @@ import {
   ReloadOutlined,
   EyeOutlined,
   StarOutlined,
-  ExportOutlined,
-  ImportOutlined
+  ExportOutlined
 } from '@ant-design/icons';
 import {
   getProducts,
@@ -46,15 +43,61 @@ import {
   type Category,
   type Brand
 } from '../../api/product';
+import styles from '@/assets/styles/products/productDetail.module.scss';
 
 const { Option } = Select;
 const { TextArea } = Input;
+
+const getProductStatusColor = (status: string) => {
+  if (status === '上架') return 'green';
+  if (status === '下架') return 'red';
+  return 'orange';
+};
+
+const formatProductDate = (value?: string) => {
+  if (!value) return '未记录';
+  const date = new Date(value);
+  return Number.isNaN(date.getTime()) ? '未记录' : date.toLocaleString();
+};
+
+const escapeCsvCell = (value: unknown) => {
+  const stringValue = value == null ? '' : String(value);
+  return `"${stringValue.replace(/"/g, '""')}"`;
+};
+
+const formatExportFileTime = () => {
+  const date = new Date();
+  const pad = (value: number) => String(value).padStart(2, '0');
+
+  return [
+    date.getFullYear(),
+    pad(date.getMonth() + 1),
+    pad(date.getDate()),
+    pad(date.getHours()),
+    pad(date.getMinutes()),
+    pad(date.getSeconds())
+  ].join('-');
+};
+
+const downloadCsvFile = (content: string, fileName: string) => {
+  const blob = new Blob([`\uFEFF${content}`], { type: 'text/csv;charset=utf-8;' });
+  const url = window.URL.createObjectURL(blob);
+  const link = document.createElement('a');
+
+  link.href = url;
+  link.download = fileName;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  window.URL.revokeObjectURL(url);
+};
 
 const ProductManagement: React.FC = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [brands, setBrands] = useState<Brand[]>([]);
   const [loading, setLoading] = useState(false);
+  const [exporting, setExporting] = useState(false);
   const [total, setTotal] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
@@ -313,6 +356,91 @@ const ProductManagement: React.FC = () => {
       }
     } catch (error) {
       message.error('状态更新失败');
+    }
+  };
+
+  const handleExport = async () => {
+    if (exporting) {
+      return;
+    }
+
+    setExporting(true);
+
+    try {
+      const exportPageSize = total || pageSize || 1000;
+      const response = await getProducts({
+        ...searchParams,
+        page: 1,
+        pageSize: exportPageSize
+      });
+
+      if (response.code !== 0) {
+        message.error(response.message || '导出失败');
+        return;
+      }
+
+      const exportList = response.data.list || [];
+
+      if (exportList.length === 0) {
+        message.warning('暂无可导出的商品');
+        return;
+      }
+
+      const headers = [
+        '商品名称',
+        '品牌',
+        '分类',
+        '售价',
+        '原价',
+        '库存',
+        '最低库存',
+        '状态',
+        'SKU',
+        '评分',
+        '销量',
+        '标签',
+        '商品描述',
+        '重量',
+        '保质期',
+        '产地',
+        '口味',
+        '创建时间',
+        '更新时间'
+      ];
+
+      const rows = exportList.map((product) => [
+        product.name,
+        product.brand,
+        product.category,
+        product.price,
+        product.originalPrice,
+        product.stock,
+        product.minStock ?? 10,
+        product.status,
+        product.sku || '',
+        product.rating ?? 0,
+        product.sales ?? 0,
+        product.tags?.join('、') || '',
+        product.description || '',
+        product.weight || '',
+        product.shelf_life || '',
+        product.origin || '',
+        product.flavor || '',
+        formatProductDate(product.createTime),
+        formatProductDate(product.updateTime)
+      ]);
+
+      const csvContent = [headers, ...rows]
+        .map((row) => row.map(escapeCsvCell).join(','))
+        .join('\n');
+
+      downloadCsvFile(csvContent, `products-${formatExportFileTime()}.csv`);
+      message.success(`导出成功，共 ${exportList.length} 条商品数据`);
+    } catch (error) {
+      console.error('导出商品失败:', error);
+      message.error('导出失败，请稍后重试');
+    } finally {
+      setExporting(false);
     }
   };
 
@@ -594,11 +722,12 @@ const ProductManagement: React.FC = () => {
               >
                 刷新
               </Button>
-              <Button icon={<ExportOutlined />}>
+              <Button
+                icon={<ExportOutlined />}
+                loading={exporting}
+                onClick={handleExport}
+              >
                 导出
-              </Button>
-              <Button icon={<ImportOutlined />}>
-                导入
               </Button>
             </Space>
           </Col>
@@ -840,120 +969,183 @@ const ProductManagement: React.FC = () => {
       <Drawer
         title="商品详情"
         placement="right"
-        width={600}
+        size="large"
         open={isDetailVisible}
         onClose={() => setIsDetailVisible(false)}
       >
         {viewingProduct && (
-          <div>
-            <div style={{ textAlign: 'center', marginBottom: 24 }}>
-              <Image
-                width={200}
-                height={200}
-                src={viewingProduct.image || 'https://via.placeholder.com/200'}
-                style={{ borderRadius: 8 }}
-              />
-            </div>
-            
-            <Descriptions title="基本信息" bordered column={2}>
-              <Descriptions.Item label="商品名称" span={2}>
-                {viewingProduct.name}
-              </Descriptions.Item>
-              <Descriptions.Item label="品牌">
-                {viewingProduct.brand}
-              </Descriptions.Item>
-              <Descriptions.Item label="分类">
-                {viewingProduct.category}
-              </Descriptions.Item>
-              <Descriptions.Item label="SKU">
-                {viewingProduct.sku || '未设置'}
-              </Descriptions.Item>
-              <Descriptions.Item label="状态">
-                <Tag color={viewingProduct.status === '上架' ? 'green' : viewingProduct.status === '下架' ? 'red' : 'orange'}>
-                  {viewingProduct.status}
-                </Tag>
-              </Descriptions.Item>
-            </Descriptions>
+          <div className={styles.productDetailBody}>
+            <section className={styles.productDetailHero}>
+              <div className={styles.productDetailImage}>
+                {viewingProduct.image ? (
+                  <img src={viewingProduct.image} alt={viewingProduct.name} />
+                ) : (
+                  <div className={styles.productImageFallback}>无图</div>
+                )}
+              </div>
 
-            <Divider />
+              <div>
+                <span className={styles.productDetailKicker}>PRODUCT DETAIL</span>
+                <h2 className={styles.productDetailName}>{viewingProduct.name}</h2>
+                <div className={styles.productDetailMeta}>
+                  {viewingProduct.brand || '未设置品牌'} / {viewingProduct.category || '未设置分类'}
+                </div>
+                <Space wrap style={{ marginTop: 12 }}>
+                  <Tag color={getProductStatusColor(viewingProduct.status)}>
+                    {viewingProduct.status || '未设置状态'}
+                  </Tag>
+                  <Tag color="blue">SKU {viewingProduct.sku || '未设置'}</Tag>
+                  <Tag color={viewingProduct.stock <= (viewingProduct.minStock || 10) ? 'red' : 'green'}>
+                    库存 {viewingProduct.stock ?? 0}
+                  </Tag>
+                </Space>
+              </div>
 
-            <Descriptions title="价格库存" bordered column={2}>
-              <Descriptions.Item label="售价">
-                <span style={{ color: '#f50', fontWeight: 'bold' }}>
-                  ¥{viewingProduct.price}
-                </span>
-              </Descriptions.Item>
-              <Descriptions.Item label="原价">
-                {viewingProduct.originalPrice ? `¥${viewingProduct.originalPrice}` : '未设置'}
-              </Descriptions.Item>
-              <Descriptions.Item label="库存">
-                {viewingProduct.stock}
-              </Descriptions.Item>
-              <Descriptions.Item label="最低库存">
-                {viewingProduct.minStock || 10}
-              </Descriptions.Item>
-            </Descriptions>
+              <div className={styles.productPriceBlock}>
+                <span>当前售价</span>
+                <strong>¥{Number(viewingProduct.price || 0).toFixed(2)}</strong>
+                {viewingProduct.originalPrice ? (
+                  <div className={styles.productOriginalPrice}>
+                    原价 ¥{Number(viewingProduct.originalPrice).toFixed(2)}
+                  </div>
+                ) : null}
+              </div>
+            </section>
 
-            <Divider />
+            <div className={styles.productDetailGrid}>
+              <section className={styles.detailCard}>
+                <h3>基础信息</h3>
+                <div className={styles.detailLine}>
+                  <span>商品名称</span>
+                  <strong>{viewingProduct.name}</strong>
+                </div>
+                <div className={styles.detailLine}>
+                  <span>品牌</span>
+                  <strong>{viewingProduct.brand || '未设置'}</strong>
+                </div>
+                <div className={styles.detailLine}>
+                  <span>分类</span>
+                  <strong>{viewingProduct.category || '未设置'}</strong>
+                </div>
+                <div className={styles.detailLine}>
+                  <span>SKU</span>
+                  <strong>{viewingProduct.sku || '未设置'}</strong>
+                </div>
+                <div className={styles.detailLine}>
+                  <span>状态</span>
+                  <strong>
+                    <Tag color={getProductStatusColor(viewingProduct.status)}>
+                      {viewingProduct.status || '未设置'}
+                    </Tag>
+                  </strong>
+                </div>
+              </section>
 
-            <Descriptions title="商品属性" bordered column={2}>
-              <Descriptions.Item label="重量">
-                {viewingProduct.weight || '未设置'}
-              </Descriptions.Item>
-              <Descriptions.Item label="保质期">
-                {viewingProduct.shelf_life || '未设置'}
-              </Descriptions.Item>
-              <Descriptions.Item label="产地">
-                {viewingProduct.origin || '未设置'}
-              </Descriptions.Item>
-              <Descriptions.Item label="口味">
-                {viewingProduct.flavor || '未设置'}
-              </Descriptions.Item>
-              <Descriptions.Item label="评分">
-                <StarOutlined style={{ color: '#fadb14', marginRight: 4 }} />
-                {viewingProduct.rating || 0}
-              </Descriptions.Item>
-              <Descriptions.Item label="销量">
-                {viewingProduct.sales || 0}
-              </Descriptions.Item>
-            </Descriptions>
-
-            {viewingProduct.tags && viewingProduct.tags.length > 0 && (
-              <>
-                <Divider />
-                <div>
-                  <h4>标签</h4>
-                  <div>
-                    {viewingProduct.tags.map((tag, index) => (
-                      <Tag key={index} color="cyan" style={{ marginBottom: 8 }}>
-                        {tag}
-                      </Tag>
-                    ))}
+              <section className={styles.detailCard}>
+                <h3>价格库存</h3>
+                <div className={styles.metricGrid}>
+                  <div className={`${styles.metricCard} ${styles.metricCardAccent}`}>
+                    <span>售价</span>
+                    <strong>¥{Number(viewingProduct.price || 0).toFixed(2)}</strong>
+                  </div>
+                  <div className={styles.metricCard}>
+                    <span>原价</span>
+                    <strong>
+                      {viewingProduct.originalPrice ? `¥${Number(viewingProduct.originalPrice).toFixed(2)}` : '未设置'}
+                    </strong>
+                  </div>
+                  <div className={styles.metricCard}>
+                    <span>库存</span>
+                    <strong>{viewingProduct.stock ?? 0}</strong>
+                  </div>
+                  <div className={styles.metricCard}>
+                    <span>最低库存</span>
+                    <strong>{viewingProduct.minStock || 10}</strong>
                   </div>
                 </div>
-              </>
-            )}
+              </section>
+            </div>
 
-            {viewingProduct.description && (
-              <>
-                <Divider />
-                <div>
-                  <h4>商品描述</h4>
-                  <p style={{ whiteSpace: 'pre-wrap' }}>{viewingProduct.description}</p>
+            <div className={styles.productDetailGrid}>
+              <section className={styles.detailCard}>
+                <h3>商品属性</h3>
+                <div className={styles.detailLine}>
+                  <span>重量</span>
+                  <strong>{viewingProduct.weight || '未设置'}</strong>
                 </div>
-              </>
-            )}
+                <div className={styles.detailLine}>
+                  <span>保质期</span>
+                  <strong>{viewingProduct.shelf_life || '未设置'}</strong>
+                </div>
+                <div className={styles.detailLine}>
+                  <span>产地</span>
+                  <strong>{viewingProduct.origin || '未设置'}</strong>
+                </div>
+                <div className={styles.detailLine}>
+                  <span>口味</span>
+                  <strong>{viewingProduct.flavor || '未设置'}</strong>
+                </div>
+              </section>
 
-            <Divider />
+              <section className={styles.detailCard}>
+                <h3>经营表现</h3>
+                <div className={styles.metricGrid}>
+                  <div className={styles.metricCard}>
+                    <span>评分</span>
+                    <strong>
+                      <StarOutlined style={{ color: '#fadb14', marginRight: 6 }} />
+                      {viewingProduct.rating || 0}
+                    </strong>
+                  </div>
+                  <div className={styles.metricCard}>
+                    <span>销量</span>
+                    <strong>{viewingProduct.sales || 0}</strong>
+                  </div>
+                  <div className={styles.metricCard}>
+                    <span>推荐</span>
+                    <strong>{viewingProduct.isRecommended ? '是' : '否'}</strong>
+                  </div>
+                  <div className={styles.metricCard}>
+                    <span>排序</span>
+                    <strong>{viewingProduct.sort ?? '未设置'}</strong>
+                  </div>
+                </div>
+              </section>
+            </div>
 
-            <Descriptions title="时间信息" bordered column={1}>
-              <Descriptions.Item label="创建时间">
-                {new Date(viewingProduct.createTime).toLocaleString()}
-              </Descriptions.Item>
-              <Descriptions.Item label="更新时间">
-                {new Date(viewingProduct.updateTime).toLocaleString()}
-              </Descriptions.Item>
-            </Descriptions>
+            <section className={styles.detailCard}>
+              <h3>标签</h3>
+              {viewingProduct.tags?.length ? (
+                <div className={styles.tagStack}>
+                  {viewingProduct.tags.map((tag, index) => (
+                    <Tag key={`${tag}-${index}`} color="cyan">
+                      {tag}
+                    </Tag>
+                  ))}
+                </div>
+              ) : (
+                <p className={styles.descriptionText}>暂无标签</p>
+              )}
+            </section>
+
+            <section className={styles.detailCard}>
+              <h3>商品描述</h3>
+              <p className={styles.descriptionText}>
+                {viewingProduct.description || '暂无商品描述'}
+              </p>
+            </section>
+
+            <section className={styles.detailCard}>
+              <h3>时间信息</h3>
+              <div className={styles.detailLine}>
+                <span>创建时间</span>
+                <strong>{formatProductDate(viewingProduct.createTime)}</strong>
+              </div>
+              <div className={styles.detailLine}>
+                <span>更新时间</span>
+                <strong>{formatProductDate(viewingProduct.updateTime)}</strong>
+              </div>
+            </section>
           </div>
         )}
       </Drawer>

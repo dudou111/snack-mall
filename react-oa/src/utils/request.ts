@@ -10,6 +10,23 @@ const axiosRequest = axios.create({
   },
 });
 
+function parseStoredToken(value: string | null): string {
+  if (!value) return "";
+
+  try {
+    const parsed = JSON.parse(value);
+    return typeof parsed === "string" ? parsed : value;
+  } catch {
+    return value;
+  }
+}
+
+function getStoredAuthToken(): string {
+  return parseStoredToken(
+    localStorage.getItem("token") || localStorage.getItem("ACCESS_TOKEN")
+  );
+}
+
 type RequestClient = {
   request<T = any>(config: any): Promise<T>;
   get<T = any>(url: string, config?: any): Promise<T>;
@@ -24,8 +41,10 @@ export const request = axiosRequest as unknown as RequestClient;
 
 request.interceptors.request.use(
   (req) => {
-    req.headers.authorization =
-      "Bearer " + localStorage.getItem("ACCESS_TOKEN");
+    const token = getStoredAuthToken();
+    if (token) {
+      req.headers.authorization = "Bearer " + token;
+    }
     return req;
   },
   (err) => {

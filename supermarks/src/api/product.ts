@@ -34,6 +34,17 @@ export const productApi = {
       data: payload
     }),
 
+  uploadProductImage: (file: File) => {
+    const formData = new FormData();
+    formData.append("image", file);
+
+    return request<{ imageUrl: string; filename: string }>({
+      url: "/api/product/upload-image",
+      method: "POST",
+      data: formData
+    });
+  },
+
   getUploadRecords: (params?: { page?: number; pageSize?: number }) =>
     request<{ list: ProductItem[] }>({
       url: "/api/product/upload-records",

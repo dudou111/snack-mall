@@ -1,0 +1,64 @@
+# 依赖
+node_modules/
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# 构建输出
+dist/
+build/
+*.log
+
+# 环境变量
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# 调试
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+
+# 测试覆盖率
+coverage/
+*.lcov
+.nyc_output
+
+# 临时文件
+*.tmp
+*.temp
+.cache/
+
+# 上传的文件（保留目录结构，忽略具体文件）
+server/static/*.jpg
+server/static/*.jpeg
+server/static/*.png
+server/static/*.gif
+server/static/*.webp
+!server/static/.gitkeep
+
+# 数据库备份
+*.dump
+*.sql
+
+# 操作系统
+Thumbs.db
+Desktop.ini
+
+# 其他
+*.bak
+*.orig
+
+# 文档
+doc/*

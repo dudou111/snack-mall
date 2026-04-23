@@ -13,9 +13,11 @@ const adminAuthRouter = require('./router/adminAuthRouter');
 const productRouter = require('./router/productRouter');
 const orderRouter = require('./router/orderRouter');
 const userRouter = require('./router/userRouter');
+const dashboardRouter = require('./router/dashboardRouter');
 const AdminUser = require('./model/adminUser');
 const MD5 = require('md5');
 const { getStartupDiagnostics } = require('./utils/startupDiagnostics');
+const { attachNotificationSocket } = require('./utils/notificationHub');
 
 // 配置mongoose连接选项
 mongoose.set('strictQuery', false);
@@ -81,6 +83,7 @@ mongoose
         app.use('/api/product', productRouter);
         app.use('/api/order', orderRouter);
         app.use('/api/user', userRouter);
+        app.use('/api/dashboard', dashboardRouter);
 
         // 健康检查接口
         app.get('/health', (req, res) => {
@@ -123,6 +126,7 @@ mongoose
             console.log('🚀 服务器启动成功: http://127.0.0.1:8088');
             console.log(`💳 Stripe测试密钥: ${startupDiagnostics.stripeSecretKeyStatus}`);
         });
+        attachNotificationSocket(server);
 
         // 优雅关闭
         process.on('SIGTERM', () => {

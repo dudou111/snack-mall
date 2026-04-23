@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { productApi, type ProductPayload } from "../api/product";
 import { orderApi } from "../api/order";
 import type { OrderEntity, ProductItem } from "../types";
@@ -20,8 +20,12 @@ export default function MerchantDashboard() {
   const [orders, setOrders] = useState<OrderEntity[]>([]);
   const [loading, setLoading] = useState(false);
   const [savingProduct, setSavingProduct] = useState(false);
+  const [uploadingImage, setUploadingImage] = useState(false);
+  const [selectedImageName, setSelectedImageName] = useState("");
+  const [imageFeedback, setImageFeedback] = useState("");
   const [actionId, setActionId] = useState("");
   const [error, setError] = useState("");
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   async function loadData() {
     setLoading(true);
@@ -48,6 +52,38 @@ export default function MerchantDashboard() {
     setProductForm((prev) => ({ ...prev, [key]: value }));
   }
 
+  async function handleImageSelect(event: React.ChangeEvent<HTMLInputElement>) {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    setSelectedImageName(file.name);
+    setUploadingImage(true);
+    setImageFeedback("");
+    setError("");
+
+    try {
+      const result = await productApi.uploadProductImage(file);
+      updateForm("image", result.imageUrl);
+      setImageFeedback("图片上传成功，可直接提交商品");
+    } catch (err) {
+      updateForm("image", "");
+      setImageFeedback("");
+      setError(err instanceof Error ? err.message : "图片上传失败");
+    } finally {
+      setUploadingImage(false);
+      event.target.value = "";
+    }
+  }
+
+  function clearSelectedImage() {
+    updateForm("image", "");
+    setSelectedImageName("");
+    setImageFeedback("");
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
+  }
+
   async function submitProduct(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setSavingProduct(true);
@@ -56,6 +92,11 @@ export default function MerchantDashboard() {
     try {
       await productApi.createProduct(productForm);
       setProductForm(initialProduct);
+      setSelectedImageName("");
+      setImageFeedback("");
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
       await loadData();
     } catch (err) {
       setError(err instanceof Error ? err.message : "商品上传失败");
@@ -92,11 +133,39 @@ export default function MerchantDashboard() {
             <option value="下架">下架</option>
             <option value="缺货">缺货</option>
           </select>
-          <input className="input" placeholder="图片 URL（可选）" value={productForm.image} onChange={(e) => updateForm("image", e.target.value)} />
+          <div className="image-upload-box">
+            <input
+              ref={fileInputRef}
+              className="hidden-file-input"
+              type="file"
+              accept="image/*"
+              onChange={handleImageSelect}
+            />
+            <div className="inline-actions wrap">
+              <button
+                className="ghost-btn"
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                disabled={uploadingImage}
+              >
+                {uploadingImage ? "图片上传中..." : "选择商品图片"}
+              </button>
+              {productForm.image ? (
+                <button className="ghost-btn" type="button" onClick={clearSelectedImage} disabled={uploadingImage}>
+                  清除图片
+                </button>
+              ) : null}
+            </div>
+            <p className="muted upload-meta">
+              {selectedImageName ? `已选择：${selectedImageName}` : "支持 JPG / PNG / WebP，单张不超过 5MB"}
+            </p>
+            {imageFeedback ? <p className="success-text upload-meta">{imageFeedback}</p> : null}
+            {productForm.image ? <img className="upload-preview" src={productForm.image} alt="商品预览" /> : null}
+          </div>
           <input className="input" placeholder="描述（可选）" value={productForm.description} onChange={(e) => updateForm("description", e.target.value)} />
           <div className="inline-actions">
-            <button className="primary-btn" type="submit" disabled={savingProduct}>
-              {savingProduct ? "提交中..." : "上传商品"}
+            <button className="primary-btn" type="submit" disabled={savingProduct || uploadingImage}>
+              {savingProduct ? "提交中..." : uploadingImage ? "等待图片上传..." : "上传商品"}
             </button>
             <button className="ghost-btn" type="button" onClick={loadData}>
               刷新数据
@@ -116,6 +185,7 @@ export default function MerchantDashboard() {
         <div className="table-like">
           {uploadRecords.map((item) => (
             <div className="row-card" key={item._id}>
+              {item.image ? <img className="record-thumb" src={item.image} alt={item.name} /> : null}
               <div>
                 <h3>{item.name}</h3>
                 <p className="muted">
